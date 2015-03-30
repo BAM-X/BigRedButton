@@ -1,8 +1,9 @@
-#!/usr/bin/python
+#!/usr/bin/env python2
 from usb import core, util
 import atexit
 from time import sleep
 from array import array
+import subprocess
 
 '''
 Extensive credit goes to https://gist.github.com/arr2036/9932438
@@ -89,6 +90,7 @@ def cleanup():
 
 def button_pressed():
     print "BAM"
+    subprocess.call(['mpg123','bam.mp3'])
 
 
 def button_not_pressed():
