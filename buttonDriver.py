@@ -3,7 +3,8 @@ from usb import core, util
 import atexit
 from time import sleep
 from array import array
-import subprocess
+from subprocess import Popen
+import shlex
 
 '''
 Extensive credit goes to https://gist.github.com/arr2036/9932438
@@ -29,6 +30,7 @@ BUTTON_STATE_LID_OPEN = 0x17
 
 should_exit = False
 kernel_was_attached = False
+warning_p = None
 
 def get_device_handle():
     dev = core.find(idVendor=VENDOR_ID, idProduct=PRODUCT_ID)
@@ -79,8 +81,18 @@ def read_button_state(dev):
     return data[0]
 
 
+def stop_warning():
+    global warning_p
+    try:
+        warning_p.terminate()
+        warning_p = None
+    except:
+        pass
+
+
 def cleanup():
     print "Cleaning up"
+    stop_warning()
     interface = 0
     # release the device
     util.release_interface(device_handle, interface)
@@ -90,15 +102,21 @@ def cleanup():
 
 def button_pressed():
     print "BAM"
-    subprocess.call(['mpg123','bam.mp3'])
+    stop_warning()
+    Popen(['mpg123','bam.mp3'], close_fds=True)
 
 
 def button_not_pressed():
-    pass
+    print "NO BAM"
+    stop_warning()
 
 
 def lid_opened():
     print "WARNING..."
+    global warning_p
+    args = shlex.split('mpg123 --loop -1 warning.mp3');
+    if not warning_p:
+        warning_p = Popen(args, close_fds=True)
 
 command = {
     BUTTON_STATE_LID_CLOSED: button_not_pressed,
