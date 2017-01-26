@@ -1,0 +1,14 @@
+# Instructions:
+#  - Plug in button first!
+#  - Install this unit file in /etc/systemd/system/
+#  - Enable and start the service
+
+[Unit]
+Description=BAM button
+
+[Service]
+WorkingDirectory=/opt/BigRedButton
+ExecStart=/opt/BigRedButton/run.sh
+
+[Install]
+WantedBy=multi-user.target
